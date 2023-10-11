@@ -5,6 +5,8 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
+
 
 class AdminMiddleware
 {
@@ -13,8 +15,19 @@ class AdminMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+
+    // public function handle(Request $request, Closure $next): Response
+    // {
+    //     return $next($request);
+    // }
+
+    public function handle(Request $request, Closure $next)
     {
-        return $next($request);
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            return $next($request);
+        }
+
+        return abort(403, 'Anda bukan admin, gabisa akses.');
     }
+
 }

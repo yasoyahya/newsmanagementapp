@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Interfaces\NewsRepositoryInterfaces;
 use App\Models\News;
-use Illuminate\Support\Facades\DB;
 
 
 class NewsRepository implements NewsRepositoryInterfaces
@@ -36,7 +35,7 @@ class NewsRepository implements NewsRepositoryInterfaces
 
     public function delete($id)
     {
-        $news = News::find($id);
+        $news = News::findOrFail($id);
         if ($news) {
             $news->delete();
             return true;
@@ -44,8 +43,8 @@ class NewsRepository implements NewsRepositoryInterfaces
         return false;
     }
 
-    public function paginate($perPage)
+    public function paginate()
     {
-        return DB::table('news')->paginate($perPage);
+        return News::paginate(4);
     }
 }

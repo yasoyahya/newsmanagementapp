@@ -17,15 +17,10 @@ class NewsController extends Controller
         $this->newsRepository = $newsRepository;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        $perPage = $request->input('per_page', 5);
-
-        // $news = $this->newsRepository->all();
-        $news = $this->newsRepository->paginate($perPage);
-
+        $news = $this->newsRepository->all();
         return NewsResource::collection($news);
-        // return response()->json($news);
     }
 
     public function show($id)
@@ -33,10 +28,10 @@ class NewsController extends Controller
         $news = $this->newsRepository->find($id);
 
         if (!$news) {
-            return response()->json(['error' => 'Berita tidak ditemukan'], 404);
+            return response()->json(['error' => 'News not found'], 404);
         }
 
-        return response()->json($news);
+        return new NewsResource($news);
     }
 
     public function store(NewsRequest $request)
@@ -44,9 +39,7 @@ class NewsController extends Controller
         $data = $request->validated();
         $news = $this->newsRepository->create($data);
 
-        event(new NewsEvent($news, 'create'));
-
-        return response()->json($news, 201);
+        return new NewsResource($news);
     }
 
     public function update(NewsRequest $request, $id)
@@ -55,12 +48,10 @@ class NewsController extends Controller
         $news = $this->newsRepository->update($id, $data);
 
         if (!$news) {
-            return response()->json(['error' => 'Berita tidak ditemukan'], 404);
+            return response()->json(['error' => 'News not found'], 404);
         }
 
-        event(new NewsEvent($news, 'update'));
-
-        return response()->json($news);
+        return new NewsResource($news);
     }
 
     public function destroy($id)
@@ -71,8 +62,6 @@ class NewsController extends Controller
             return response()->json(['error' => 'Berita tidak ditemukan'], 404);
         }
 
-        event(new NewsEvent(null, 'delete'));
-        
         return response()->json(['message' => 'Berita dihapus'], 204);
     }
 }
